@@ -6,7 +6,7 @@ namespace Infrastructure.Server.Api.Controllers;
 
 [Route("[controller]")]
 [ApiController]
-public class AddressController(IRepository<Address> repository) : ControllerBase
+public class AddressController(IRepository<Address> repository,IInfrastructureService addressService) : ControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> Get()
@@ -18,6 +18,18 @@ public class AddressController(IRepository<Address> repository) : ControllerBase
     public async Task<IActionResult> Add(Address entity)
     {
         var result = await repository.Add(entity);
+        if (!result)
+        {
+            return BadRequest();
+        }
+
+        return Ok();
+    }
+
+    [HttpPost("stored-procedure")]
+    public async Task<IActionResult> AddWithSp(string country, string city, string street)
+    {
+        var result = await addressService.AddAddress(country, city,street);
         if (!result)
         {
             return BadRequest();
